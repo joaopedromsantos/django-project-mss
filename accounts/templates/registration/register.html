@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}Registrar{% endblock %}
+
+{% block content %} 
+<div class="col-md-4 mt-4 mx-4 px-4 py-4 bg-light rounded-4">
+    <h4>Criar uma conta</h4>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button class="btn btn-warning mt-3" type="submit">Registrar</button>
+    </form>
+</div>
+{% endblock %}

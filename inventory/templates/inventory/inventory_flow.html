@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Fluxo de Estoque{% endblock %}
+
+{% block content %}
+<div class="container mt-4 mx-4 px-4 py-4 bg-light rounded-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Movimentações no Estoque</h2>
+        <button type="button" class="btn btn-success d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#addStockModal">
+            <i class="bi bi-plus-lg me-2"></i>Adicionar Estoque
+        </button>
+    </div>
+
+    <form method="get" class="mb-4">
+        <div class="row g-3">
+            <div class="col-md-4 col-12">
+                <label for="company" class="form-label">Empresa</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-building"></i></span>
+                    <select id="company" name="company" class="form-select">
+                        <option value="">Todas as empresas</option>
+                        {% for id, name in company_choices %}
+                            <option value="{{ id }}" {% if id|stringformat:"s" == request.GET.company %}selected{% endif %}>{{ name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-4 col-12">
+                <label for="weight" class="form-label">Kg</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-box-seam"></i></span>
+                    <select id="weight" name="weight" class="form-select">
+                        <option value="">Todos os pesos</option>
+                        {% for id, name in weight_choices %}
+                            <option value="{{ id }}" {% if id|stringformat:"s" == request.GET.weight %}selected{% endif %}>{{ name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-4 col-12">
+                <label for="bag_type" class="form-label">Material</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-tag"></i></span>
+                    <select id="bag_type" name="bag_type" class="form-select">
+                        <option value="">Todos os materiais</option>
+                        {% for id, name in bag_type_choices %}
+                            <option value="{{ id }}" {% if id|stringformat:"s" == request.GET.bag_type %}selected{% endif %}>{{ name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-md-4 col-12">
+                <label for="invoice" class="form-label">Número da NF</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-receipt"></i></span>
+                    <input type="number" class="form-control" id="invoice" name="invoice" placeholder="Digite o número" value="{{ request.GET.invoice }}">
+                </div>
+            </div>
+            {% include 'inventory/components/date_picker.html' %}
+            <div class="col-md-4 col-12 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100"><i class="bi bi-funnel-fill me-2"></i>Filtrar</button>
+            </div>
+        </div>
+    </form>
+
+    <div class="table-responsive rounded-2">
+        <table class="table table-bordered table-striped table-hover">
+            <thead class="thead-dark table-dark">
+                <tr>
+                    <th>Data</th>
+                    <th>Empresa</th>
+                    <th>Kg</th>
+                    <th>Tipo</th>
+                    <th>Quantidade</th>
+                    <th>NF</th>
+                    <th class="text-center">Operação</th> </tr>
+            </thead>
+            <tbody>
+                {% for flow in page_obj %}
+                <tr>
+                    <td>{{ flow.movement_date|date:"d/m/Y H:i" }}</td>
+                    <td>{{ flow.company }}</td>
+                    <td>{{ flow.weight }}</td>
+                    <td>{{ flow.bag_type }}</td>
+                    <td>{{ flow.quantity }}</td>
+                    <td>{{ flow.invoice }}</td>
+                    <td class="text-center">
+                        <form action="{% url 'inventory:delete_flow' flow.pk %}" method="POST" class="d-inline">
+
+                            {% csrf_token %}
+
+                            <button type="submit" class="btn btn-danger btn-sm"
+                                    onclick="return confirm('Tem certeza que deseja excluir esta movimentação? A quantidade será abatida do estoque total.');">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center">Nenhum dado encontrado com os filtros aplicados.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if page_obj.paginator.num_pages > 1 %}
+        {% include 'components/pagination.html' %}
+    {% endif %}
+
+    {% include 'inventory/components/inventory_modal.html' %}
+
+
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+<script src="{% static 'inventory/js/date_picker.js' %}"></script>
+<script src="{% static 'inventory/js/inventory_modal.js' %}"></script>
+
+{% endblock %}

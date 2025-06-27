@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}Total em Estoque{% endblock %}
+
+{% block content %}
+<div class="container mt-4 mx-4 px-4 py-4 bg-light rounded-4">
+    <h2 class="mb-4">Quantidade Total em Estoque</h2>
+
+    <form method="get" class="mb-4">
+        <div class="row g-3">
+            <div class="col-md-3 col-12">
+                <label for="company" class="form-label">Empresa</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-building"></i></span>
+                    <select id="company" name="company" class="form-select">
+                        <option value="">Todas as empresas</option>
+                        {% for id, name in company_choices %}
+                            <option value="{{ id }}" {% if id|stringformat:"s" == request.GET.company %}selected{% endif %}>{{ name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-3 col-12">
+                <label for="weight" class="form-label">Kg</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-box-seam"></i></span>
+                    <select id="weight" name="weight" class="form-select">
+                        <option value="">Todos os pesos</option>
+                        {% for id, name in weight_choices %}
+                            <option value="{{ id }}" {% if id|stringformat:"s" == request.GET.weight %}selected{% endif %}>{{ name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-3 col-12">
+                <label for="bag_type" class="form-label">Material</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-tag"></i></span>
+                    <select id="bag_type" name="bag_type" class="form-select">
+                        <option value="">Todos os materiais</option>
+                        {% for id, name in bag_type_choices %}
+                            <option value="{{ id }}" {% if id|stringformat:"s" == request.GET.bag_type %}selected{% endif %}>{{ name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-3 col-12 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100"><i class="bi bi-funnel-fill me-2"></i>Filtrar</button>
+            </div>
+        </div>
+    </form>
+
+    <div class="table-responsive rounded-2">
+        <table class="table table-bordered table-striped">
+            <thead class="thead-dark table-dark">
+                <tr>
+                    <th>Empresa</th>
+                    <th>Kg</th>
+                    <th>Tipo</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for stock in page_obj %}
+                <tr>
+                    <td>{{ stock.company }}</td>
+                    <td>{{ stock.weight }}</td>
+                    <td>{{ stock.bag_type }}</td>
+                    <td>{{ stock.quantity }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center">Nenhum estoque encontrado com os filtros aplicados.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if page_obj.paginator.num_pages > 1 %}
+        {% include 'components/pagination.html' %}
+    {% endif %}
+</div>
+{% endblock %}

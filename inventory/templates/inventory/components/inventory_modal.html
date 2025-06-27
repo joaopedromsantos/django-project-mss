@@ -1,0 +1,54 @@
+<div class="modal fade" id="addStockModal" tabindex="-1" aria-labelledby="addStockModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addStockModalLabel">Adicionar Nova Movimentação</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addStockForm" data-add-stock-url="{% url 'inventory:add_stock' %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="modalCompany" class="form-label">Empresa</label>
+                            <select id="modalCompany" name="company" class="form-select" required>
+                                <option value="" selected disabled>Selecione...</option>
+                                {% for id, name in company_choices %}
+                                    <option value="{{ id }}" {% if name == company_filter %}selected{% endif %}>{{ name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="modalWeight" class="form-label">Kg</label>
+                            <select id="modalWeight" name="weight" class="form-select" required>
+                                 <option value="" selected disabled>Selecione...</option>
+                                {% for id, name in weight_choices %}
+                                    <option value="{{ id }}" {% if name == weight_filter %}selected{% endif %}>{{ name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="modalBagType" class="form-label">Material</label>
+                            <select id="modalBagType" name="bag_type" class="form-select" required>
+                                 <option value="" selected disabled>Selecione...</option>
+                                {% for id, name in bag_type_choices %}
+                                    <option value="{{ id }}" {% if name == bag_type_filter %}selected{% endif %}>{{ name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="modalQuantity" class="form-label">Quantidade</label>
+                            <input type="number" class="form-control" id="modalQuantity" name="quantity" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="modalInvoice" class="form-label">Nota Fiscal</label>
+                            <input type="text" class="form-control" id="modalInvoice" name="invoice">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" form="addStockForm">Adicionar</button>
+                </div>
+            </div>
+        </div>
+    </div>
