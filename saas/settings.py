@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 import os
 from dotenv import load_dotenv
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -78,15 +79,26 @@ WSGI_APPLICATION = 'saas.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+DATABASE_URL = os.getenv('DATABASE_URL')
 
-DATABASES = {
-    'default': os.getenv('DATABASE_URL') if os.getenv('DATABASE_URL') else {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+if DATABASE_URL:
+    db_config = dj_database_url.parse(DATABASE_URL)
+
+    db_config['ENGINE'] = 'django.db.backends.postgresql_psycopg2'
+    db_config['CONN_SETTINGS'] = {'sslmode': 'require'}
+    db_config['CONN_MAX_AGE'] = 600
+
+    DATABASES = {
+        'default': db_config
     }
-}
 
-
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -150,7 +162,4 @@ if not DEBUG:
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
     
-    DATABASES['default']['CONN_SETTINGS'] = {'sslmode': 'require'}
-    DATABASES['default']['CONN_MAX_AGE'] = 600
-
 
