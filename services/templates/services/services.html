@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Lista de Marcações{% endblock %}
+
+{% block content %}
+<div class="container mt-4 mx-4 px-4 py-4 bg-light rounded-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Marcações Solicitadas</h2>
+        <button type="button" class="btn btn-success d-flex align-items-center"
+                data-bs-toggle="modal"
+                data-bs-target="#serviceModal"
+                data-mode="create"
+                data-form-url="{% url 'services:create_service' %}">
+            <i class="bi bi-plus-lg me-2"></i>Adicionar Marcação
+        </button>
+    </div>
+
+    <form method="get" class="mb-4">
+        <div class="row g-3">
+            <div class="col-md-4 col-12">
+                <label for="company" class="form-label">Empresa</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-building"></i></span>
+                    <select id="company" name="company" class="form-select">
+                        <option value="">Todas as empresas</option>
+                        {% for id, name in company_choices %}
+                            <option value="{{ id }}" {% if id|stringformat:"s" == request.GET.company %}selected{% endif %}>{{ name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-md-4 col-12">
+                <label for="weight" class="form-label">Peso (Kg)</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-box-seam"></i></span>
+                    <select id="weight" name="weight" class="form-select">
+                        <option value="">Todos os pesos</option>
+                        {% for id, name in weight_choices %}
+                            <option value="{{ id }}" {% if id|stringformat:"s" == request.GET.weight %}selected{% endif %}>{{ name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-md-4 col-12">
+                <label for="bag_type" class="form-label">Material</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-tag"></i></span>
+                    <select id="bag_type" name="bag_type" class="form-select">
+                        <option value="">Todos os tipos</option>
+                        {% for id, name in bag_type_choices %}
+                            <option value="{{ id }}" {% if id|stringformat:"s" == request.GET.bag_type %}selected{% endif %}>{{ name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-md-4 col-12">
+                <label for="oic" class="form-label">OIC</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-receipt"></i></span>
+                    <input type="text" class="form-control" id="oic" name="oic" placeholder="Digite a OIC" value="{{ request.GET.oic }}">
+                </div>
+            </div>
+
+            {% include 'inventory/components/date_picker.html' %}
+
+            <div class="col-md-4 col-12 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100"><i class="bi bi-funnel-fill me-2"></i>Filtrar</button>
+            </div>
+        </div>
+    </form>
+
+    <div class="table-responsive rounded-2">
+        <table class="table table-bordered table-striped table-hover">
+            <thead class="thead-dark table-dark">
+                <tr>
+                    <th>Data do Pedido</th>
+                    <th>Empresa</th>
+                    <th>Peso (Kg)</th>
+                    <th>Material</th>
+                    <th>Quantidade</th>
+                    <th>OIC</th>
+                    <th>Cobrado?</th>
+                    <th class="text-center" style="min-width: 121px;">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for service in page_obj %}
+                <tr>
+                    <td>{{ service.request_date|date:"d/m/Y H:i" }}</td>
+                    <td>{{ service.company }}</td>
+                    <td>{{ service.weight }}</td>
+                    <td>{{ service.bag_type }}</td>
+                    <td>{{ service.quantity }}</td>
+                    <td>{{ service.oic|default:"N/A" }}</td>
+                    <td>
+                        <span class="badge {% if service.is_billed %}bg-success{% else %}bg-warning{% endif %}">
+                            {{ service.is_billed|yesno:"Sim,Não" }}
+                        </span>
+                    </td>
+                    <td class="text-center">
+                        <button type="button" class="btn btn-info btn-sm"
+                                data-bs-toggle="modal"
+                                data-bs-target="#serviceModal"
+                                data-mode="view"
+                                data-url="{% url 'services:get_service_details' service.pk %}">
+                            <i class="bi bi-eye"></i>
+                        </button>
+
+                        <button type="button" class="btn btn-primary btn-sm"
+                                data-bs-toggle="modal"
+                                data-bs-target="#serviceModal"
+                                data-mode="edit"
+                                data-url="{% url 'services:get_service_details' service.pk %}"
+                                data-form-url="{% url 'services:update_service' service.pk %}">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        
+                        <form action="{% url 'services:delete_service' service.pk %}" method="POST" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Tem certeza que deseja excluir essa marcação? A quantidade de sacarias será devolvida ao estoque');">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" class="text-center">Nenhum serviço encontrado com os filtros aplicados.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if page_obj.paginator.num_pages > 1 %}
+        {% include 'components/pagination.html' %}
+    {% endif %}
+
+    {% include 'services/components/service_modal.html' %}
+
+
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+<script src="{% static 'inventory/js/date_picker.js' %}"></script>
+<script src="{% static 'services/js/service_modal.js' %}"></script>
+{% endblock %}

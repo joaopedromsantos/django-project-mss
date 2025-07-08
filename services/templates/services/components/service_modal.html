@@ -1,0 +1,87 @@
+<div class="modal fade" id="serviceModal" tabindex="-1" aria-labelledby="serviceModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="serviceModalLabel"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+    <form id="serviceForm" method="POST">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="modalCompany" class="form-label">Empresa</label>
+                <select id="modalCompany" name="company" class="form-select" required>
+                    <option value="" selected disabled>Selecione...</option>
+                    {% for id, name in company_choices %}
+                        <option value="{{ id }}">{{ name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="modalWeight" class="form-label">Peso (Kg)</label>
+                <select id="modalWeight" name="weight" class="form-select" required>
+                    <option value="" selected disabled>Selecione...</option>
+                    {% for id, name in weight_choices %}
+                        <option value="{{ id }}">{{ name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="modalBagType" class="form-label">Material</label>
+                <select id="modalBagType" name="bag_type" class="form-select" required>
+                    <option value="" selected disabled>Selecione...</option>
+                    {% for id, name in bag_type_choices %}
+                        <option value="{{ id }}">{{ name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="modalQuantity" class="form-label">Quantidade</label>
+                <input type="number" class="form-control" id="modalQuantity" name="quantity" required>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="modalOic" class="form-label">OIC</label>
+            <input type="text" class="form-control" id="modalOic" name="oic">
+        </div>
+
+        <div class="mb-3">
+            <label for="modalEmail" class="form-label">Email</label>
+            <input type="text" class="form-control" id="modalEmail" name="email"> </div>
+
+        <div class="mb-3">
+            <label for="modalNotes" class="form-label">Observações</label>
+            <textarea class="form-control" id="modalNotes" name="notes" rows="3"></textarea>
+        </div>
+
+        <div class="mb-3">
+            <label for="modalRequestDate" class="form-label">Data do Pedido</label>
+            <input type="date" class="form-control" id="modalRequestDate" name="request_date">
+        </div>
+
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="modalIsBilled" name="is_billed">
+            <label class="form-check-label" for="modalIsBilled">
+                Serviço já cobrado?
+            </label>
+        </div>
+        
+        <div id="billedDateContainer" class="row mt-3" style="display: none;">
+            <div class="col-md-6 mb-3">
+                <label for="modalBilledDate" class="form-label">Data da Cobrança</label>
+                <input type="date" class="form-control" id="modalBilledDate" name="billed_date">
+            </div>
+        </div>
+    </form>
+</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                <button type="submit" class="btn btn-primary" id="modalSubmitButton" form="serviceForm"></button>
+            </div>
+        </div>
+    </div>
+</div>
