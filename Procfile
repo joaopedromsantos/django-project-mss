@@ -1,2 +1,1 @@
-release: python manage.py migrate
-web: gunicorn saas.wsgi --log-file -
+web: python manage.py migrate && gunicorn saas.wsgi --log-file -
